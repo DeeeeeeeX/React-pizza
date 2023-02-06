@@ -1,6 +1,5 @@
 import s from './NotFoundBlock.module.scss'
 
-console.log(s)
 const NotFoundBlock = () => {
   return (
     <div className={s.root}>
