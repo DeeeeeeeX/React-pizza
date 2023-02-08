@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit'
-import filterSlice from "./slices/cartSlice";
+import filter from "./slices/filterSlice";
 
 export const store = configureStore({
     reducer: {
-        filter: filterSlice,
+        filter,
     },
 })

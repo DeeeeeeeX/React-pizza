@@ -1,6 +1,12 @@
 import {useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {setMethodType, setSort} from "../redux/slices/filterSlice";
 
-function Sort({value, onChangeSort, setOrderType}) {
+function Sort() {
+    const dispatch = useDispatch()
+    const sort = useSelector((state) => state.filter.sort)
+
+
     const [open, setOpen] = useState(false)
     const list = [
         {name: 'популярности', sortProperty: 'rating'},
@@ -8,12 +14,15 @@ function Sort({value, onChangeSort, setOrderType}) {
         {name: 'алфавиту', sortProperty: 'title'},
     ]
 
-    console.log(setOrderType)
-
-    const onClickListItem = (i) => {
-        onChangeSort(i)
+    const onClickListItem = (obj) => {
+        dispatch(setSort(obj))
         setOpen(false)
     }
+
+    const setOrderType = (method) => {
+        dispatch(setMethodType(method))
+    }
+
 
     return (
         <div className="sort">
@@ -31,21 +40,21 @@ function Sort({value, onChangeSort, setOrderType}) {
                     />
                 </svg>
                 <b>Сортировка по:</b>
-                <span onClick={() => setOpen(!open)}>{value.name}</span>
+                <span onClick={() => setOpen(!open)}>{sort.name}</span>
             </div>
             {open && (
                 <div className="sort__popup">
                     <ul>
                         {list.map((obj, i) => (
                             <li key={i} onClick={() => onClickListItem(obj)}
-                                className={value.sortProperty === obj.sortProperty ? 'active' : ''}>{obj.name}</li>
+                                className={sort.sortProperty === obj.sortProperty ? 'active' : ''}>{obj.name}</li>
                         ))}
                     </ul>
                 </div>
             )}
             <div className='order'>
-                <button onClick={() => setOrderType('asc')}> ↑ </button>
-                <button onClick={() => setOrderType('desc')}> ↓ </button>
+                <button onClick={() => setOrderType('asc')}> ↑</button>
+                <button onClick={() => setOrderType('desc')}> ↓</button>
             </div>
         </div>
 
