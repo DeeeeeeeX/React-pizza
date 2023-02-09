@@ -1,23 +1,35 @@
 import Categories from "../components/Categories";
-import Sort from "../components/Sort";
+import Sort, {sortList} from "../components/Sort";
 import Skeleton from "../components/PizzaBlock/skeleton";
 import PizzaBlock from "../components/PizzaBlock";
-import {useContext, useEffect, useState} from "react";
 import Pagination from "../components/Pagination";
 import {SearchContext} from "../App";
+import {setCategoryId, setCurrentPage, setFilters} from "../redux/slices/filterSlice";
+
+import {useContext, useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {setCategoryId, setCurrentPage} from "../redux/slices/filterSlice";
 import axios from "axios";
+import qs from 'qs'
+import {useNavigate} from "react-router-dom";
+import {logDOM} from "@testing-library/react";
 
 const Home = () => {
-
+    const navigate = useNavigate()
     const dispatch = useDispatch()
+    const isSearch = useRef(false)
+    const isMounted = useRef(false)
+
     const filter = useSelector((state) => state.filter)
     const currentPage = useSelector((state) => state.filter.currentPage)
 
     const {searchValue} = useContext(SearchContext)
     const [items, setItems] = useState([])
     const [isLoading, setIsLoading] = useState(true)
+
+    const pizzas = items
+        .map((obj) => <PizzaBlock key={obj.id} {...obj} />)
+
+    const skeletons = [...new Array(8)].map((_, index) => <Skeleton key={index}/>)
 
     const onChangeCategory = (id) => {
         dispatch(setCategoryId(id))
@@ -27,27 +39,62 @@ const Home = () => {
         dispatch(setCurrentPage(number))
     }
 
-    const pizzas = items
-        .map((obj) => <PizzaBlock key={obj.id} {...obj} />)
-
-    const skeletons = [...new Array(8)].map((_, index) => <Skeleton key={index}/>)
-
-
-    useEffect(() => {
+    const fetchPizzas = () => {
         setIsLoading(true)
 
         const search = searchValue ? `&search=${searchValue}` : ''
 
         axios
             .get(
-            `https://63dc382dc45e08a04356e0d4.mockapi.io/items?page=${currentPage}&limit=4&${filter.categoryId > 0 ? `category=${filter.categoryId}` : ''}&sortBy=${filter.sort.sortProperty}&order=${filter.sort.orderType}${search}`
-        )
+                `https://63dc382dc45e08a04356e0d4.mockapi.io/items?page=${currentPage}&limit=4&${filter.categoryId > 0 ? `category=${filter.categoryId}` : ''}&sortBy=${filter.sort.sortProperty}&order=${filter.sort.orderType}${search}`
+            )
             .then((res) => {
                 setItems(res.data)
                 setIsLoading(false)
             })
+    }
 
+    // Если изменили параметры и был первый рендер
+    useEffect(() => {
+        if (isMounted.current) {
+            const queryString = qs.stringify({
+                sortProperty: filter.sort.sortProperty,
+                categoryId: filter.categoryId,
+                currentPage,
+                order: filter.sort.orderType
+            })
+
+            navigate(`?${queryString}`)
+        }
+        isMounted.current = true
+    }, [filter, searchValue, currentPage])
+
+    // Если был первый рендер, то проверяем URL - параметры и сохраняем в редаксе
+    useEffect(() => {
+        if (window.location.search) {
+            const params = qs.parse(window.location.search.substring(1))
+
+            const sort = sortList.find(obj => obj.sortProperty === params.sortProperty)
+
+            dispatch(
+                setFilters({
+                    ...params,
+                    sort: {...sort, orderType: params.order},
+                })
+            )
+            isSearch.current = true
+        }
+    }, [])
+
+    // Если был первый рендер, то запрашиваем пиццы
+    useEffect(() => {
         window.scrollTo(0, 0)
+
+        if (!isSearch.current) {
+            fetchPizzas()
+        }
+
+        isSearch.current = false
     }, [filter, searchValue, currentPage])
 
     return (
