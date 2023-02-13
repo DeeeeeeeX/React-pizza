@@ -1,5 +1,5 @@
 import {useDispatch} from "react-redux";
-import {addItem, clearItems, minusItem, removeItem} from "../redux/slices/cartSlice";
+import {addItem, minusItem, removeItem} from "../redux/slices/cartSlice";
 
 export const CartItem = ({id, title, type, price, size, count, imageUrl}) => {
     const dispatch = useDispatch()

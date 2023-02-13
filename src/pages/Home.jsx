@@ -11,6 +11,7 @@ import {useDispatch, useSelector} from "react-redux";
 import axios from "axios";
 import qs from 'qs'
 import {useNavigate} from "react-router-dom"
+import {setItems} from "../redux/slices/pizzasSlice";
 
 const Home = () => {
     const navigate = useNavigate()
@@ -20,9 +21,9 @@ const Home = () => {
 
     const filter = useSelector((state) => state.filter)
     const currentPage = useSelector((state) => state.filter.currentPage)
+    const items = useSelector((state) => state.pizza.items)
 
     const {searchValue} = useContext(SearchContext)
-    const [items, setItems] = useState([])
     const [isLoading, setIsLoading] = useState(true)
 
     const pizzas = items
@@ -38,19 +39,22 @@ const Home = () => {
         dispatch(setCurrentPage(number))
     }
 
-    const fetchPizzas = () => {
+    const fetchPizzas = async () => {
         setIsLoading(true)
 
         const search = searchValue ? `&search=${searchValue}` : ''
 
-        axios
-            .get(
-                `https://63dc382dc45e08a04356e0d4.mockapi.io/items?page=${currentPage}&limit=4&${filter.categoryId > 0 ? `category=${filter.categoryId}` : ''}&sortBy=${filter.sort.sortProperty}&order=${filter.sort.orderType}${search}`
-            )
-            .then((res) => {
-                setItems(res.data)
-                setIsLoading(false)
-            })
+        try {
+            const {data} = await axios.get(`https://63dc382dc45e08a04356e0d4.mockapi.io/items?page=${currentPage}&limit=4&${filter.categoryId > 0 ? `category=${filter.categoryId}` : ''}&sortBy=${filter.sort.sortProperty}&order=${filter.sort.orderType}${search}`)
+            dispatch(setItems(data))
+        } catch (error) {
+            alert('Ошибка при получении пицц')
+            console.log('ERROR', error)
+        } finally {
+            setIsLoading(false)
+        }
+
+        window.scrollTo(0, 0)
     }
 
     // Если изменили параметры и был первый рендер
