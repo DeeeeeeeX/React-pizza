@@ -3,14 +3,13 @@ import Sort, {sortList} from "../components/Sort";
 import Skeleton from "../components/PizzaBlock/skeleton";
 import PizzaBlock from "../components/PizzaBlock";
 import Pagination from "../components/Pagination";
-import {SearchContext} from "../App";
 import {selectCurrentPage, selectFilter, setCategoryId, setCurrentPage, setFilters} from "../redux/slices/filterSlice";
 import {fetchPizzas, selectPizzaData} from "../redux/slices/pizzasSlice";
 
-import {useContext, useEffect, useRef} from "react";
+import {useEffect, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import qs from 'qs'
-import {useNavigate} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -23,7 +22,8 @@ const Home = () => {
     const currentPage = useSelector(selectCurrentPage)
     const {items, status} = useSelector(selectPizzaData)
 
-    const pizzas = items.map((obj) => <PizzaBlock key={obj.id} {...obj} />)
+    const pizzas = items.map((obj) => <PizzaBlock {...obj} />)
+
     const skeletons = [...new Array(8)].map((_, index) => <Skeleton key={index}/>)
 
     const onChangeCategory = (id) => {
