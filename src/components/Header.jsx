@@ -8,8 +8,6 @@ function Header() {
     const {items, totalPrice} = useSelector(selectCart)
     const location = useLocation()
 
-    console.log(location, window.location)
-
     const totalCount = items.reduce((sum, item) => {return item.count + sum}, 0)
 
     return (

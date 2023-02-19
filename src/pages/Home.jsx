@@ -9,7 +9,7 @@ import {fetchPizzas, selectPizzaData} from "../redux/slices/pizzasSlice";
 import {useEffect, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import qs from 'qs'
-import {Link, useNavigate} from "react-router-dom"
+import {useNavigate} from "react-router-dom"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -22,7 +22,7 @@ const Home = () => {
     const currentPage = useSelector(selectCurrentPage)
     const {items, status} = useSelector(selectPizzaData)
 
-    const pizzas = items.map((obj) => <PizzaBlock {...obj} />)
+    const pizzas = items.map((obj) => <PizzaBlock key={obj.id} {...obj} />)
 
     const skeletons = [...new Array(8)].map((_, index) => <Skeleton key={index}/>)
 
