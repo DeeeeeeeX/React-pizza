@@ -6,12 +6,12 @@ import Pagination from "../components/Pagination";
 import {selectCurrentPage, selectFilter, setCategoryId, setCurrentPage, setFilters} from "../redux/slices/filterSlice";
 import {fetchPizzas, selectPizzaData} from "../redux/slices/pizzasSlice";
 
-import {useEffect, useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import qs from 'qs'
 import {useNavigate} from "react-router-dom"
 
-const Home = () => {
+const Home: React.FC = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const isSearch = useRef(false)
@@ -22,23 +22,25 @@ const Home = () => {
     const currentPage = useSelector(selectCurrentPage)
     const {items, status} = useSelector(selectPizzaData)
 
-    const pizzas = items.map((obj) => <PizzaBlock key={obj.id} {...obj} />)
+    const pizzas = items.map((obj: any) => <PizzaBlock key={obj.id} {...obj} />)
 
     const skeletons = [...new Array(8)].map((_, index) => <Skeleton key={index}/>)
 
-    const onChangeCategory = (id) => {
-        dispatch(setCategoryId(id))
+    const onChangeCategory = (idx: number) => {
+        dispatch(setCategoryId(idx))
     }
 
-    const onChangePage = number => {
-        dispatch(setCurrentPage(number))
+    const onChangePage = (page: number) => {
+        dispatch(setCurrentPage(page))
     }
 
     const getPizzas = async () => {
 
         const search = searchValue ? `&search=${searchValue}` : ''
 
-        dispatch(fetchPizzas({
+        dispatch(
+            // @ts-ignore
+            fetchPizzas({
                 currentPage,
                 filter,
                 search
