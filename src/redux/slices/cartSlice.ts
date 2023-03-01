@@ -1,5 +1,19 @@
 import {createSlice} from "@reduxjs/toolkit";
 
+type CartItem = {
+    id: string;
+    title: string;
+    price: number;
+    imageUrl: string;
+    sizes: number[];
+    types: number[];
+}
+
+interface CartSliceState {
+    totalPrice: number,
+    items: CartItem[]
+}
+
 const initialState = {
     totalPrice: 0,
     items: []
